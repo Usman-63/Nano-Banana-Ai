@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ImageUpload from './components/ImageUpload';
 import StyleSelector from './components/StyleSelector';
@@ -10,7 +10,7 @@ import Register from './components/Register';
 import UserProfile from './components/UserProfile';
 
 function AppContent() {
-  const { currentUser, getIdToken, userStats, canTransform, fetchUserStats } = useAuth();
+  const { currentUser, getIdToken, userStats, canTransform, fetchUserStats, registerLogoutCallback } = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [selectedStyle, setSelectedStyle] = useState('Anime Style');
@@ -20,6 +20,24 @@ function AppContent() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+
+  // Reset app state function for logout
+  const resetAppState = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setSelectedStyle('Anime Style');
+    setTransformedImage(null);
+    setIsLoading(false);
+    setError(null);
+    setShowLogin(false);
+    setShowRegister(false);
+    setShowProfile(false);
+  };
+
+  // Register logout callback
+  useEffect(() => {
+    registerLogoutCallback(resetAppState);
+  }, [registerLogoutCallback]);
 
   // App component state monitoring (debug mode only)
   if (process.env.NODE_ENV === 'development') {
