@@ -107,7 +107,7 @@ app.post('/transform', authenticateToken, upload.single('image'), async (req, re
 
     // ✅ No getGenerativeModel needed
     const response = await genAI.models.generateContent({
-      model: "gemini-2.0-flash-preview-image-generation",
+      model: "gemini-2.5-flash-image-preview",
       contents: [
         {
           role: "user",
