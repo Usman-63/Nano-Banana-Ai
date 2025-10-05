@@ -84,6 +84,10 @@ jspm_packages/
 firebase-debug.log
 firebase-debug.*.log
 
+# Firebase Service Account Keys (NEVER commit these!)
+*firebase-adminsdk*.json
+*service-account*.json
+
 # Uploads
 uploads/
 backend/uploads/
