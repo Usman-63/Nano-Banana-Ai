@@ -236,7 +236,7 @@ export function AuthProvider({ children }) {
     });
 
     return unsubscribe;
-  }, []);
+  }, [fetchUserStats]);
 
   const value = {
     currentUser,
