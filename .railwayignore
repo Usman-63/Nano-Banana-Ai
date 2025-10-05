@@ -1,0 +1,6 @@
+# Ignore frontend for Railway deployment (backend only)
+frontend/
+node_modules/
+*.log
+.env
+.env.local
