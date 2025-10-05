@@ -41,11 +41,6 @@
 - **Responsive Design**: Optimized for desktop, tablet, and mobile devices
 - **Modern UI**: Beautiful gradient design with Tailwind CSS
 
-### 📊 **Smart Usage Management**
-- **Usage Analytics**: Track remaining transformations
-- **Quota System**: Prevents abuse with intelligent limits
-- **User Profiles**: Comprehensive user statistics and management
-- **Admin Dashboard**: Monitor system usage and user activity
 
 ---
 
