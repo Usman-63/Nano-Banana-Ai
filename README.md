@@ -11,6 +11,12 @@
 <div align="center">
   <h3>Transform your images with AI-powered artistic styles</h3>
   <p>An intelligent image transformation application built with React, Node.js, and Google's Gemini 2.5 Flash AI model</p>
+  
+  <p>
+    <a href="https://nano-banana-ai-oefx.vercel.app/" target="_blank">
+      <img src="https://img.shields.io/badge/Live%20Demo-Visit%20App-green?style=for-the-badge&logo=vercel" alt="Live Demo" />
+    </a>
+  </p>
 </div>
 
 ---
@@ -195,13 +201,11 @@ Test authentication
 
 ## 🎨 Supported Styles
 
-- **Anime Style**: Japanese animation aesthetic
-- **Realistic**: Photorealistic transformation
-- **Cartoon**: Classic cartoon illustration
-- **Oil Painting**: Traditional oil painting technique
-- **Watercolor**: Soft watercolor painting style
-- **Sketch**: Pencil sketch drawing
-- **Digital Art**: Modern digital illustration
+- **Anime Style**: Transform into beautiful anime art
+- **Picasso Style**: Cubist masterpiece transformation
+- **Oil Painting Style**: Classic Degas oil painting style
+- **Frida Style**: Frida Kahlo artistic style
+- **Miniature Effect**: 1/7 scale collectible figure
 
 ---
 
@@ -270,41 +274,6 @@ Production CORS is configured for:
 - **File Size Limit**: 10MB maximum
 - **Supported Formats**: JPEG, PNG, WebP, GIF
 - **Rate Limiting**: Built-in usage tracking
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- **Google AI**: For the powerful Gemini 2.5 Flash model
-- **Firebase**: For authentication and user management
-- **React Team**: For the amazing frontend framework
-- **Tailwind CSS**: For the beautiful styling system
-
----
-
-## 📞 Support
-
-If you encounter any issues or have questions:
-
-1. Check the [Issues](https://github.com/Usman-63/Nano-Banana-Ai/issues) page
-2. Create a new issue with detailed information
-3. Contact the development team
 
 ---
 
