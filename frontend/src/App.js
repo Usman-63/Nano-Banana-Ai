@@ -23,15 +23,29 @@ function AppContent() {
   const [showProfile, setShowProfile] = useState(false);
   const [showEmailVerification, setShowEmailVerification] = useState(false);
 
-  // Debug comment: App component state monitoring
-  console.log('App: Component rendered with state -', {
-    hasFile: !!selectedFile,
-    hasPreview: !!previewUrl,
-    selectedStyle,
-    hasTransformed: !!transformedImage,
-    isLoading,
-    hasError: !!error
-  });
+  // Component state monitoring
+
+  // Reset all app state
+  const resetAppState = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setSelectedStyle('Anime Style');
+    setTransformedImage(null);
+    setIsLoading(false);
+    setError(null);
+    setShowLogin(false);
+    setShowRegister(false);
+    setShowProfile(false);
+    setShowEmailVerification(false);
+    
+    // Clean up any object URLs to prevent memory leaks
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    if (transformedImage) {
+      URL.revokeObjectURL(transformedImage);
+    }
+  };
 
   // Check if user needs email verification
   React.useEffect(() => {
@@ -40,25 +54,32 @@ function AppContent() {
     }
   }, [currentUser]);
 
+  // Reset app state when user logs out
+  React.useEffect(() => {
+    if (!currentUser) {
+      resetAppState();
+    }
+  }, [currentUser]);
+
   const handleFileSelect = (file) => {
-    console.log('App: File selection triggered -', file?.name); // Debug comment: File selection event
+    // File selection triggered
     
     if (file) {
       // Validate file size
       if (file.size > 10 * 1024 * 1024) {
-        console.error('App: File too large -', file.size, 'bytes'); // Debug comment: File size validation error
+        console.error('File too large:', file.size, 'bytes');
         setError(ErrorTypes.FILE_TOO_LARGE);
         return;
       }
       
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        console.error('App: Invalid file type -', file.type); // Debug comment: File type validation error
+        console.error('Invalid file type:', file.type);
         setError(ErrorTypes.INVALID_FILE_TYPE);
         return;
       }
       
-      console.log('App: File validation successful, setting up preview'); // Debug comment: File validation success
+      // File validation successful
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
       setTransformedImage(null);
@@ -67,27 +88,27 @@ function AppContent() {
   };
 
   const handleStyleChange = (style) => {
-    console.log('App: Style change triggered -', style); // Debug comment: Style change event
+    // Style change triggered
     setSelectedStyle(style);
   };
 
   const handleErrorDismiss = () => {
-    console.log('App: Error dismissed'); // Debug comment: Error dismiss event
+    // Error dismissed
     setError(null);
   };
 
   const handleTransform = async () => {
-    console.log('App: Transform initiated -', { file: selectedFile?.name, style: selectedStyle }); // Debug comment: Transform start event
+    // Transform initiated
     
     if (!currentUser) {
-      console.error('App: User not authenticated'); // Debug comment: Auth validation error
+      // User not authenticated
       setShowLogin(true);
       return;
     }
 
     // Check if email is verified
     if (!currentUser.emailVerified) {
-      console.error('App: Email not verified'); // Debug comment: Email verification error
+      // Email not verified
       setShowEmailVerification(true);
       return;
     }
@@ -100,25 +121,25 @@ function AppContent() {
 
     // Check usage limits
     if (!canTransform()) {
-      console.error('App: User has exceeded transformation limit'); // Debug comment: Usage limit error
+      console.error('User has exceeded transformation limit');
       setError('You have reached your transformation limit. Please try again later.');
       return;
     }
 
-    console.log('App: Starting transformation process'); // Debug comment: Transform process start
+    // Starting transformation process
     setIsLoading(true);
     setError(null);
 
     try {
-      console.log('App: Getting authentication token'); // Debug comment: Auth token retrieval
+      // Getting authentication token
       const idToken = await getIdToken();
       
-      console.log('App: Preparing API request'); // Debug comment: API request preparation
+      // Preparing API request
       const formData = new FormData();
       formData.append('image', selectedFile);
       formData.append('style', selectedStyle);
 
-      console.log('App: Sending API request to transform endpoint'); // Debug comment: API request sent
+      // Sending API request
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:3000'}/transform`, {
         method: 'POST',
         headers: {
@@ -127,30 +148,30 @@ function AppContent() {
         body: formData,
       });
 
-      console.log('App: API response received -', response.status); // Debug comment: API response received
+      // API response received
 
       if (!response.ok) {
         if (response.status === 401) {
-          console.error('App: Authentication error from API'); // Debug comment: API auth error
+          console.error('Authentication error from API');
           setShowLogin(true);
           throw new Error('Authentication required. Please log in again.');
         } else if (response.status === 429) {
-          console.error('App: Usage limit exceeded from API'); // Debug comment: API usage limit error
+          console.error('Usage limit exceeded from API');
           const errorData = await response.json();
           throw new Error(errorData.message || 'You have reached your transformation limit.');
         } else if (response.status === 413) {
-          console.error('App: File too large error from API'); // Debug comment: API file size error
+          console.error('File too large error from API');
           throw new Error(ErrorTypes.FILE_TOO_LARGE);
         } else if (response.status >= 500) {
-          console.error('App: Server error from API'); // Debug comment: API server error
+          console.error('Server error from API');
           throw new Error(ErrorTypes.API_ERROR);
         } else {
-          console.error('App: Network error from API'); // Debug comment: API network error
+          console.error('Network error from API');
           throw new Error(ErrorTypes.NETWORK_ERROR);
         }
       }
 
-      console.log('App: Response is OK, processing image...'); // Debug comment: Image processing start
+      // Processing image response
       
       // Get usage stats from response headers
       const usageStatsHeader = response.headers.get('X-Usage-Stats');
@@ -158,7 +179,7 @@ function AppContent() {
       if (usageStatsHeader) {
         try {
           usageStats = JSON.parse(usageStatsHeader);
-          console.log('App: Usage stats from headers:', usageStats);
+          // Usage stats from headers
         } catch (e) {
           console.warn('App: Could not parse usage stats from headers');
         }
@@ -168,31 +189,28 @@ function AppContent() {
       const imageBlob = await response.blob();
       const imageUrl = URL.createObjectURL(imageBlob);
       
-      console.log('App: Image blob created, size:', imageBlob.size, 'bytes');
-      console.log('App: Image URL created:', imageUrl);
+      // Image blob created and URL generated
       
       // Set the transformed image
       setTransformedImage(imageUrl);
-      console.log('App: Transformed image set in state');
+      // Transformed image set in state
       
       // Update user stats after successful transformation
-      console.log('App: Updating user stats...'); // Debug comment: Stats update start
+      // Update user stats
       await fetchUserStats();
-      console.log('App: User stats updated'); // Debug comment: Stats update complete
     } catch (err) {
-      console.error('App: Error transforming image -', err); // Debug comment: Transform error caught
+      console.error('Error transforming image:', err);
       
       if (err.name === 'TypeError' && err.message.includes('fetch')) {
-        console.error('App: Network connection error'); // Debug comment: Network connection error
+        console.error('Network connection error');
         setError(ErrorTypes.NETWORK_ERROR);
       } else {
-        console.error('App: Setting error state -', err.message); // Debug comment: Error state setting
+        // Setting error state
         setError(err.message || ErrorTypes.UNKNOWN_ERROR);
       }
     } finally {
-      console.log('App: Transform process completed, stopping loading'); // Debug comment: Transform process end
+      // Transform process completed
       setIsLoading(false);
-      console.log('App: Loading state set to false');
     }
   };
 
@@ -352,7 +370,7 @@ function AppContent() {
                   <div className="bg-white rounded-xl shadow-lg p-6 mt-6 w-[60%] mx-auto" >
               <button
                 onClick={() => {
-                  console.log('App: Transform button clicked'); // Debug comment: Transform button click event
+                  // Transform button clicked
                   handleTransform();
                 }}
                 disabled={!selectedFile || !selectedStyle || isLoading || (currentUser && !canTransform())}

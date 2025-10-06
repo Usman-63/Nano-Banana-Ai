@@ -56,15 +56,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// CORS debugging middleware
-app.use((req, res, next) => {
-  console.log(`🌐 CORS: ${req.method} ${req.path} from origin: ${req.headers.origin || 'no-origin'}`);
-  next();
-});
-
 // Handle CORS preflight requests
 app.options('*', (req, res) => {
-  console.log(`🌐 CORS Preflight: ${req.method} ${req.path} from origin: ${req.headers.origin || 'no-origin'}`);
   res.status(200).end();
 });
 
@@ -104,7 +97,7 @@ function readImageAsBase64(filePath) {
 
 app.post('/transform', authenticateToken, upload.single('image'), async (req, res) => {
   try {
-    console.log(`🔐 Transform request received`);
+    // Process transformation request
     
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'No image uploaded' });
@@ -123,7 +116,7 @@ app.post('/transform', authenticateToken, upload.single('image'), async (req, re
     }
 
     const style = req.body.style || 'Anime Style';
-    console.log("🔹 Style:", style);
+    // Process image transformation
 
     const stylePrompts = { 
 "Anime Style": "Using the provided image of this person, transform this portrait into pretty, anime style.", 
@@ -140,12 +133,7 @@ app.post('/transform', authenticateToken, upload.single('image'), async (req, re
 
     const imageData = readImageAsBase64(req.file.path);
 
-    console.log("🔹 Prompt:", prompt);
-    console.log("🔹 Mime:", req.file.mimetype);
-    console.log("🔹 Image data length:", imageData?.length);
-
-    // ✅ Generate content with timeout
-    console.log("🔹 Calling Google AI API...");
+    // Generate content with Google AI
     
     const response = await Promise.race([
       genAI.models.generateContent({
@@ -173,18 +161,13 @@ app.post('/transform', authenticateToken, upload.single('image'), async (req, re
       )
     ]);
     
-    console.log("🔹 Google AI API call completed");
-
     // Extract image with better error handling
-    console.log("🔹 Google AI Response received, checking structure...");
     
     if (!response.candidates || response.candidates.length === 0) {
-      console.error("❌ No candidates in response");
       throw new Error("No candidates returned from Gemini");
     }
     
     if (!response.candidates[0].content || !response.candidates[0].content.parts) {
-      console.error("❌ No content parts in response");
       throw new Error("No content parts returned from Gemini");
     }
     
@@ -194,18 +177,9 @@ app.post('/transform', authenticateToken, upload.single('image'), async (req, re
     );
     
     if (!transformedImage || !transformedImage.inlineData) {
-      console.error("❌ No image data in response parts");
-      console.log("Available parts:", response.candidates[0].content.parts.map(p => ({ 
-        type: p.text ? 'text' : 'data', 
-        hasInlineData: !!p.inlineData,
-        mimeType: p.inlineData?.mimeType 
-      })));
       throw new Error("No image data returned from Gemini");
     }
     
-    console.log("✅ Image data found, size:", transformedImage.inlineData.data.length, "bytes");
-    console.log("✅ Image MIME type:", transformedImage.inlineData.mimeType);
-
     // Convert base64 to buffer
     const imageBuffer = Buffer.from(transformedImage.inlineData.data, 'base64');
     
@@ -217,15 +191,13 @@ app.post('/transform', authenticateToken, upload.single('image'), async (req, re
     res.setHeader('Content-Length', imageBuffer.length);
     res.setHeader('X-Usage-Stats', JSON.stringify(usageStats));
     
-    console.log("🔹 Sending image as binary response...");
     res.send(imageBuffer);
-    console.log("✅ Image sent successfully");
 
     // Clean up uploaded file
     try {
       if (req.file && req.file.path) {
         fs.unlinkSync(req.file.path);
-        console.log("🗑️ Cleaned up uploaded file");
+        // File cleaned up
       }
     } catch (cleanupError) {
       console.error("⚠️ Failed to clean up file:", cleanupError.message);

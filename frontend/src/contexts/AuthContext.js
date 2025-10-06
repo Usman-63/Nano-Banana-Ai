@@ -30,7 +30,6 @@ export function AuthProvider({ children }) {
   // Sign up function
   async function signup(email, password, displayName) {
     try {
-      console.log('🔐 Creating new user account...');
       const result = await createUserWithEmailAndPassword(auth, email, password);
       
       // Update user profile with display name
@@ -39,8 +38,6 @@ export function AuthProvider({ children }) {
           displayName: displayName
         });
       }
-      
-      console.log('✅ User account created successfully');
       return result;
     } catch (error) {
       console.error('❌ Signup error:', error);
@@ -51,9 +48,7 @@ export function AuthProvider({ children }) {
   // Login function
   async function login(email, password) {
     try {
-      console.log('🔐 Signing in user...');
       const result = await signInWithEmailAndPassword(auth, email, password);
-      console.log('✅ User signed in successfully');
       return result;
     } catch (error) {
       console.error('❌ Login error:', error);
@@ -64,10 +59,10 @@ export function AuthProvider({ children }) {
   // Logout function
   async function logout() {
     try {
-      console.log('🔐 Signing out user...');
       await signOut(auth);
+      // Reset all user-related state
       setUserStats(null);
-      console.log('✅ User signed out successfully');
+      setCurrentUser(null);
     } catch (error) {
       console.error('❌ Logout error:', error);
       throw error;
@@ -77,9 +72,7 @@ export function AuthProvider({ children }) {
   // Reset password function
   async function resetPassword(email) {
     try {
-      console.log('🔐 Sending password reset email...');
       await sendPasswordResetEmail(auth, email);
-      console.log('✅ Password reset email sent');
     } catch (error) {
       console.error('❌ Password reset error:', error);
       throw error;
@@ -93,9 +86,7 @@ export function AuthProvider({ children }) {
     }
     
     try {
-      console.log('🔐 Sending email verification...');
       await sendEmailVerification(currentUser);
-      console.log('✅ Email verification sent');
     } catch (error) {
       console.error('❌ Email verification error:', error);
       throw error;
@@ -125,11 +116,8 @@ export function AuthProvider({ children }) {
     }
     
     try {
-      console.log('📊 Fetching user stats for:', currentUser.email);
-      console.log('📊 Environment REACT_APP_BACKEND_URL:', process.env.REACT_APP_BACKEND_URL);
       const token = await getIdToken();
       const url = `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:3000'}/user/stats`;
-      console.log('📊 Making request to:', url);
       
       const response = await fetch(url, {
         headers: {
@@ -138,16 +126,13 @@ export function AuthProvider({ children }) {
         }
       });
       
-      console.log('📊 Response status:', response.status);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('📊 User stats received:', data.usage);
         setUserStats(data.usage);
         return data.usage;
       } else {
         const errorText = await response.text();
-        console.error('📊 Failed to fetch user stats:', response.status, errorText);
+        console.error('Failed to fetch user stats:', response.status, errorText);
         return null;
       }
     } catch (error) {
@@ -183,10 +168,7 @@ export function AuthProvider({ children }) {
 
   // Listen for auth state changes
   useEffect(() => {
-    console.log('🔐 Setting up auth state listener...');
-    
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log('🔐 Auth state changed:', user ? `User: ${user.email}` : 'No user');
       setCurrentUser(user);
       
       if (user) {
