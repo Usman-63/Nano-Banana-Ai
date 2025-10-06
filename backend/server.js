@@ -176,7 +176,7 @@ app.post('/transform', authenticateToken, upload.single('image'), async (req, re
     console.log("🔹 Google AI API call completed");
 
     // Extract image with better error handling
-    console.log("🔹 Google AI Response:", JSON.stringify(response, null, 2));
+    console.log("🔹 Google AI Response received, checking structure...");
     
     if (!response.candidates || response.candidates.length === 0) {
       console.error("❌ No candidates in response");
@@ -188,17 +188,21 @@ app.post('/transform', authenticateToken, upload.single('image'), async (req, re
       throw new Error("No content parts returned from Gemini");
     }
     
-    const transformedImage = response.candidates[0].content.parts.find(
-      part => part.inlineData
-    );
-
-    if (!transformedImage) {
+    // Find the image part (should be the first part based on your response structure)
+    const transformedImage = response.candidates[0].content.parts[0];
+    
+    if (!transformedImage || !transformedImage.inlineData) {
       console.error("❌ No image data in response parts");
-      console.log("Available parts:", response.candidates[0].content.parts);
+      console.log("Available parts:", response.candidates[0].content.parts.map(p => ({ 
+        type: p.text ? 'text' : 'data', 
+        hasInlineData: !!p.inlineData,
+        mimeType: p.inlineData?.mimeType 
+      })));
       throw new Error("No image data returned from Gemini");
     }
     
-    console.log("✅ Image data found, size:", transformedImage.inlineData.data.length);
+    console.log("✅ Image data found, size:", transformedImage.inlineData.data.length, "bytes");
+    console.log("✅ Image MIME type:", transformedImage.inlineData.mimeType);
 
     // Record the transformation for usage tracking
     const usageStats = await recordTransformation(req.user.uid, 'image_transform');
