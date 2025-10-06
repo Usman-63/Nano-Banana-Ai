@@ -188,8 +188,10 @@ app.post('/transform', authenticateToken, upload.single('image'), async (req, re
       throw new Error("No content parts returned from Gemini");
     }
     
-    // Find the image part (should be the first part based on your response structure)
-    const transformedImage = response.candidates[0].content.parts[0];
+    // Find the image part (look for the part with inlineData)
+    const transformedImage = response.candidates[0].content.parts.find(
+      part => part.inlineData
+    );
     
     if (!transformedImage || !transformedImage.inlineData) {
       console.error("❌ No image data in response parts");
