@@ -62,11 +62,7 @@ function Register({ onSwitchToLogin, onClose }) {
       console.log('🔐 Creating new account...');
       await signup(formData.email, formData.password, formData.displayName);
       console.log('✅ Account created successfully');
-      // Show success message about email verification
-      setError('✅ Account created! Please check your email for verification link.');
-      setTimeout(() => {
-        onClose();
-      }, 3000);
+      onClose();
     } catch (error) {
       console.error('❌ Registration failed:', error);
       
@@ -108,11 +104,7 @@ function Register({ onSwitchToLogin, onClose }) {
         </div>
 
         {error && (
-          <div className={`mb-4 p-3 rounded-md ${
-            error.startsWith('✅') 
-              ? 'bg-green-100 border border-green-400 text-green-700' 
-              : 'bg-red-100 border border-red-400 text-red-700'
-          }`}>
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">
             {error}
           </div>
         )}

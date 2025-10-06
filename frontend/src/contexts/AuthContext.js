@@ -6,8 +6,7 @@ import {
   signOut, 
   onAuthStateChanged,
   updateProfile,
-  sendPasswordResetEmail,
-  sendEmailVerification
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { auth } from '../firebase/config';
 
@@ -26,7 +25,6 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userStats, setUserStats] = useState(null);
-  const [onLogoutCallback, setOnLogoutCallback] = useState(null);
 
   // Sign up function
   async function signup(email, password, displayName) {
@@ -41,10 +39,7 @@ export function AuthProvider({ children }) {
         });
       }
       
-      // Send email verification
-      await sendEmailVerification(result.user);
-      console.log('✅ User account created and verification email sent');
-      
+      console.log('✅ User account created successfully');
       return result;
     } catch (error) {
       console.error('❌ Signup error:', error);
@@ -71,12 +66,6 @@ export function AuthProvider({ children }) {
       console.log('🔐 Signing out user...');
       await signOut(auth);
       setUserStats(null);
-      
-      // Call the logout callback to reset app state
-      if (onLogoutCallback) {
-        onLogoutCallback();
-      }
-      
       console.log('✅ User signed out successfully');
     } catch (error) {
       console.error('❌ Logout error:', error);
@@ -112,20 +101,12 @@ export function AuthProvider({ children }) {
   }, [currentUser]);
 
   // Fetch user stats from backend
-  const fetchUserStats = useCallback(async (user = currentUser) => {
-    if (!user) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('fetchUserStats: No user provided');
-      }
-      return null;
-    }
+  const fetchUserStats = useCallback(async () => {
+    if (!currentUser) return null;
     
     try {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('fetchUserStats: Fetching stats for user:', user.email);
-      }
-      const token = await user.getIdToken();
-      const response = await fetch('http://localhost:5000/user/stats', {
+      const token = await getIdToken();
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}/user/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -135,9 +116,6 @@ export function AuthProvider({ children }) {
       if (response.ok) {
         const data = await response.json();
         setUserStats(data.usage);
-        if (process.env.NODE_ENV === 'development') {
-          console.log('fetchUserStats: Stats loaded successfully:', data.usage);
-        }
         return data.usage;
       } else {
         console.error('Failed to fetch user stats:', response.statusText);
@@ -147,7 +125,7 @@ export function AuthProvider({ children }) {
       console.error('Error fetching user stats:', error);
       return null;
     }
-  }, [currentUser]);
+  }, [currentUser, getIdToken]);
 
   // Update user stats after transformation
   function updateUserStats(newStats) {
@@ -156,23 +134,7 @@ export function AuthProvider({ children }) {
 
   // Check if user has transformations remaining
   function canTransform() {
-    // If user is logged in but stats haven't loaded yet, allow transformation
-    // (the backend will enforce limits)
-    if (!userStats && currentUser) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('canTransform: User logged in but stats not loaded yet, allowing transformation');
-      }
-      return true;
-    }
-    if (!userStats) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('canTransform: No user stats and no current user, denying transformation');
-      }
-      return false;
-    }
-    if (process.env.NODE_ENV === 'development') {
-      console.log('canTransform: User stats loaded, remaining:', userStats.transformationsRemaining);
-    }
+    if (!userStats) return false;
     return userStats.transformationsRemaining > 0;
   }
 
@@ -189,45 +151,17 @@ export function AuthProvider({ children }) {
     };
   }
 
-  // Register logout callback
-  function registerLogoutCallback(callback) {
-    setOnLogoutCallback(() => callback);
-  }
-
-  // Check if user's email is verified
-  function isEmailVerified() {
-    return currentUser && currentUser.emailVerified;
-  }
-
-  // Resend email verification
-  async function resendEmailVerification() {
-    if (!currentUser) {
-      throw new Error('No user logged in');
-    }
-    
-    try {
-      console.log('🔐 Resending email verification...');
-      await sendEmailVerification(currentUser);
-      console.log('✅ Email verification sent');
-    } catch (error) {
-      console.error('❌ Error resending email verification:', error);
-      throw error;
-    }
-  }
-
   // Listen for auth state changes
   useEffect(() => {
     console.log('🔐 Setting up auth state listener...');
     
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔐 Auth state changed:', user ? `User: ${user.email}` : 'No user');
-      }
+      console.log('🔐 Auth state changed:', user ? `User: ${user.email}` : 'No user');
       setCurrentUser(user);
       
       if (user) {
-        // Fetch user stats when user logs in, pass user directly to avoid race condition
-        await fetchUserStats(user);
+        // Fetch user stats when user logs in
+        await fetchUserStats();
       } else {
         setUserStats(null);
       }
@@ -236,7 +170,7 @@ export function AuthProvider({ children }) {
     });
 
     return unsubscribe;
-  }, [fetchUserStats]);
+  }, []);
 
   const value = {
     currentUser,
@@ -250,10 +184,7 @@ export function AuthProvider({ children }) {
     fetchUserStats,
     updateUserStats,
     canTransform,
-    getUserInfo,
-    registerLogoutCallback,
-    isEmailVerified,
-    resendEmailVerification
+    getUserInfo
   };
 
   return (

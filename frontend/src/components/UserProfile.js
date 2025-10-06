@@ -37,7 +37,8 @@ function UserProfile({ onClose }) {
 
   const userInfo = {
     displayName: currentUser.displayName || 'User',
-    email: currentUser.email
+    email: currentUser.email,
+    emailVerified: currentUser.emailVerified
   };
 
   return (
@@ -67,6 +68,13 @@ function UserProfile({ onClose }) {
             </div>
           </div>
           
+          {!userInfo.emailVerified && (
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+              <p className="text-sm text-yellow-800">
+                ⚠️ Email not verified. Check your inbox for verification email.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Usage Stats */}
