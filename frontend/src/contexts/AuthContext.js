@@ -102,27 +102,38 @@ export function AuthProvider({ children }) {
 
   // Fetch user stats from backend
   const fetchUserStats = useCallback(async () => {
-    if (!currentUser) return null;
+    if (!currentUser) {
+      console.log('🔐 No current user, skipping stats fetch');
+      return null;
+    }
     
     try {
+      console.log('📊 Fetching user stats for:', currentUser.email);
       const token = await getIdToken();
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}/user/stats`, {
+      const url = `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}/user/stats`;
+      console.log('📊 Making request to:', url);
+      
+      const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
       
+      console.log('📊 Response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('📊 User stats received:', data.usage);
         setUserStats(data.usage);
         return data.usage;
       } else {
-        console.error('Failed to fetch user stats:', response.statusText);
+        const errorText = await response.text();
+        console.error('📊 Failed to fetch user stats:', response.status, errorText);
         return null;
       }
     } catch (error) {
-      console.error('Error fetching user stats:', error);
+      console.error('📊 Error fetching user stats:', error);
       return null;
     }
   }, [currentUser, getIdToken]);
@@ -134,7 +145,8 @@ export function AuthProvider({ children }) {
 
   // Check if user has transformations remaining
   function canTransform() {
-    if (!userStats) return false;
+    if (!currentUser) return false;
+    if (!userStats) return true; // Allow transformation while loading stats
     return userStats.transformationsRemaining > 0;
   }
 
@@ -170,7 +182,7 @@ export function AuthProvider({ children }) {
     });
 
     return unsubscribe;
-  }, []);
+  }, [fetchUserStats]);
 
   const value = {
     currentUser,

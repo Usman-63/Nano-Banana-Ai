@@ -10,7 +10,7 @@ import Register from './components/Register';
 import UserProfile from './components/UserProfile';
 
 function AppContent() {
-  const { currentUser, getIdToken, userStats, canTransform, fetchUserStats } = useAuth();
+  const { currentUser, getIdToken, userStats, canTransform, fetchUserStats, logout } = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [selectedStyle, setSelectedStyle] = useState('Anime Style');
@@ -182,14 +182,22 @@ function AppContent() {
         <div className="absolute top-1/3 right-1/4 w-28 h-28 bg-gradient-to-br from-emerald-200/10 to-teal-200/10 rounded-full blur-xl"></div>
       </div>
       {/* Header */}
-      <div className="relative z-10 bg-white/90 backdrop-blur-sm shadow-sm border-b border-white/20 min-h-[120px]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex justify-between items-center">
-            <div className="text-center flex-1">
-              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-3 leading-tight">
-                🍌 Nano Banana Image Editor
-              </h1>
-              <p className="text-base sm:text-lg text-gray-700">
+      <div className="relative z-10 bg-white/95 backdrop-blur-md shadow-lg border-b border-white/30 min-h-[140px]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
+            <div className="text-center lg:text-left flex-1">
+              <div className="flex items-center justify-center lg:justify-start space-x-3 mb-2">
+                <div className="text-4xl sm:text-5xl">🍌</div>
+                <div>
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight">
+                    Nano Banana
+                  </h1>
+                  <h2 className="text-lg sm:text-xl text-gray-600 font-medium">
+                    Image Editor
+                  </h2>
+                </div>
+              </div>
+              <p className="text-sm sm:text-base text-gray-600 max-w-md mx-auto lg:mx-0">
                 Transform your images with AI-powered artistic styles
               </p>
             </div>
@@ -200,41 +208,62 @@ function AppContent() {
                 <div className="flex items-center space-x-3">
                   {/* Usage Stats */}
                   {userStats && (
-                    <div className="text-sm text-gray-600">
-                      <span className={`font-medium ${
-                        userStats.transformationsRemaining > 2 ? 'text-emerald-600' :
-                        userStats.transformationsRemaining > 0 ? 'text-amber-600' : 'text-rose-600'
-                      }`}>
-                        {userStats.transformationsRemaining} / {userStats.maxTransformations}
-                      </span>
-                      <span className="ml-1">left</span>
+                    <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl px-4 py-2 border border-indigo-200/50">
+                      <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                        Transformations
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-2 h-2 rounded-full ${
+                          userStats.transformationsRemaining > 2 ? 'bg-emerald-500' :
+                          userStats.transformationsRemaining > 0 ? 'bg-amber-500' : 'bg-rose-500'
+                        }`}></div>
+                        <span className={`text-sm font-bold ${
+                          userStats.transformationsRemaining > 2 ? 'text-emerald-600' :
+                          userStats.transformationsRemaining > 0 ? 'text-amber-600' : 'text-rose-600'
+                        }`}>
+                          {userStats.transformationsRemaining} / {userStats.maxTransformations}
+                        </span>
+                        <span className="text-xs text-gray-500">left</span>
+                      </div>
                     </div>
                   )}
                   
                   {/* User Avatar */}
                   <button
                     onClick={() => setShowProfile(true)}
-                    className="flex items-center space-x-2 bg-indigo-50 hover:bg-indigo-100 rounded-lg px-3 py-2 transition-colors"
+                    className="flex items-center space-x-3 bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 rounded-xl px-4 py-3 transition-all duration-200 border border-indigo-200/50 hover:border-indigo-300/50 shadow-sm hover:shadow-md"
                   >
-                    <div className="h-8 w-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                    <div className="h-10 w-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
                       {(currentUser.displayName || currentUser.email || 'U').charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-sm font-medium text-gray-700">
-                      {currentUser.displayName || 'User'}
-                    </span>
+                    <div className="text-left">
+                      <div className="text-sm font-semibold text-gray-800">
+                        {currentUser.displayName || 'User'}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {currentUser.email}
+                      </div>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={logout}
+                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-all duration-200 hover:shadow-md"
+                  >
+                    Sign Out
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center space-x-3">
                   <button
                     onClick={() => setShowLogin(true)}
-                    className="px-4 py-2 text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                    className="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors hover:bg-gray-50 rounded-lg"
                   >
                     Sign In
                   </button>
                   <button
                     onClick={() => setShowRegister(true)}
-                    className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                    className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
                   >
                     Sign Up
                   </button>
