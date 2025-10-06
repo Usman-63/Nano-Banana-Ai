@@ -144,34 +144,61 @@ app.post('/transform', authenticateToken, upload.single('image'), async (req, re
     console.log("🔹 Mime:", req.file.mimetype);
     console.log("🔹 Image data length:", imageData?.length);
 
-    // ✅ No getGenerativeModel needed
-    const response = await genAI.models.generateContent({
-      model: "gemini-2.5-flash-image-preview",
-      contents: [
-        {
-          role: "user",
-          parts: [
-            { text: prompt },
-            {
-              inlineData: {
-                mimeType: req.file.mimetype,
-                data: imageData
+    // ✅ Generate content with timeout
+    console.log("🔹 Calling Google AI API...");
+    
+    const response = await Promise.race([
+      genAI.models.generateContent({
+        model: "gemini-2.5-flash-image-preview",
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: prompt },
+              {
+                inlineData: {
+                  mimeType: req.file.mimetype,
+                  data: imageData
+                }
               }
-            }
-          ]
+            ]
+          }
+        ],  
+        config: {
+          responseModalities: ["IMAGE", "TEXT"]
         }
-      ],  
-      config: {
-    responseModalities: ["IMAGE", "TEXT"]
-  }
-    });
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Google AI request timeout')), 60000)
+      )
+    ]);
+    
+    console.log("🔹 Google AI API call completed");
 
-    // Extract image
+    // Extract image with better error handling
+    console.log("🔹 Google AI Response:", JSON.stringify(response, null, 2));
+    
+    if (!response.candidates || response.candidates.length === 0) {
+      console.error("❌ No candidates in response");
+      throw new Error("No candidates returned from Gemini");
+    }
+    
+    if (!response.candidates[0].content || !response.candidates[0].content.parts) {
+      console.error("❌ No content parts in response");
+      throw new Error("No content parts returned from Gemini");
+    }
+    
     const transformedImage = response.candidates[0].content.parts.find(
       part => part.inlineData
     );
 
-    if (!transformedImage) throw new Error("No image data returned from Gemini");
+    if (!transformedImage) {
+      console.error("❌ No image data in response parts");
+      console.log("Available parts:", response.candidates[0].content.parts);
+      throw new Error("No image data returned from Gemini");
+    }
+    
+    console.log("✅ Image data found, size:", transformedImage.inlineData.data.length);
 
     // Record the transformation for usage tracking
     const usageStats = await recordTransformation(req.user.uid, 'image_transform');
@@ -182,7 +209,15 @@ app.post('/transform', authenticateToken, upload.single('image'), async (req, re
       usage: usageStats
     });
 
-    fs.unlinkSync(req.file.path);
+    // Clean up uploaded file
+    try {
+      if (req.file && req.file.path) {
+        fs.unlinkSync(req.file.path);
+        console.log("🗑️ Cleaned up uploaded file");
+      }
+    } catch (cleanupError) {
+      console.error("⚠️ Failed to clean up file:", cleanupError.message);
+    }
 
   } catch (error) {
     console.error('Error transforming image:', error);
