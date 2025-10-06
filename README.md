@@ -13,7 +13,7 @@
   <p>An intelligent image transformation application built with React, Node.js, and Google's Gemini 2.5 Flash AI model</p>
   
   <p>
-    <a href="https://nano-banana-ai-oefx.vercel.app/" target="_blank">
+    <a href="https://nano-banana-ai-beige.vercel.app/" target="_blank">
       <img src="https://img.shields.io/badge/Live%20Demo-Visit%20App-green?style=for-the-badge&logo=vercel" alt="Live Demo" />
     </a>
   </p>
@@ -40,7 +40,29 @@
 - **Live Preview**: Real-time image preview before transformation
 - **Responsive Design**: Optimized for desktop, tablet, and mobile devices
 - **Modern UI**: Beautiful gradient design with Tailwind CSS
+- **Smart State Management**: Complete app reset on logout
+- **Memory Efficient**: Optimized image handling and cleanup
 
+
+---
+
+## 🆕 Recent Updates
+
+### **Performance Optimizations**
+- ✅ **Binary Image Delivery**: Images sent as efficient binary data instead of large JSON responses
+- ✅ **Memory Management**: Proper cleanup of object URLs and blob data
+- ✅ **Production Ready**: Removed debug logs and optimized for production deployment
+
+### **Enhanced User Experience**
+- ✅ **Complete Logout Reset**: All app state resets when users log out
+- ✅ **Firestore Integration**: Real-time user data synchronization
+- ✅ **Improved Error Handling**: Better user feedback and error management
+- ✅ **CORS Optimization**: Seamless frontend-backend communication
+
+### **Technical Improvements**
+- ✅ **Google AI Integration**: Updated to use @google/genai package
+- ✅ **Security Enhancements**: Removed sensitive data from logs
+- ✅ **Code Cleanup**: Production-ready code with proper error handling
 
 ---
 
@@ -62,8 +84,8 @@
 
 ### **Database & Storage**
 - **Authentication**: Firebase Authentication
-- **User Data**: File-based storage with JSON
-- **Usage Tracking**: Local JSON database
+- **User Data**: Firestore cloud database
+- **Usage Tracking**: Firestore with real-time sync
 - **File Storage**: Temporary local storage
 
 ---
@@ -151,7 +173,9 @@
 FIREBASE_PROJECT_ID=your-project-id
 GOOGLE_API_KEY=your-google-api-key
 FIREBASE_SERVICE_ACCOUNT_KEY=your-service-account-json
+FRONTEND_URL=https://nano-banana-ai-beige.vercel.app
 NODE_ENV=production
+PORT=5000
 ```
 
 **Vercel (Frontend)**:
@@ -163,6 +187,7 @@ REACT_APP_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
 REACT_APP_FIREBASE_APP_ID=your-app-id
 REACT_APP_BACKEND_URL=https://your-railway-app.railway.app
+NODE_ENV=production
 ```
 
 ---
@@ -175,7 +200,7 @@ REACT_APP_BACKEND_URL=https://your-railway-app.railway.app
 Transform an image with AI
 - **Authentication**: Required
 - **Body**: `multipart/form-data` with `image` file and `style` string
-- **Response**: Base64 encoded transformed image
+- **Response**: Binary image data with usage stats in headers
 
 #### **GET /user/stats**
 Get user usage statistics
