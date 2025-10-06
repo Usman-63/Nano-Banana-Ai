@@ -103,7 +103,7 @@ function AppContent() {
       formData.append('style', selectedStyle);
 
       console.log('App: Sending API request to transform endpoint'); // Debug comment: API request sent
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}/transform`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:3000'}/transform`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${idToken}`
@@ -134,8 +134,19 @@ function AppContent() {
         }
       }
 
-      const data = await response.json();
-      console.log('App: API response data processed'); // Debug comment: API data processing
+      console.log('App: Response is OK, parsing JSON...'); // Debug comment: JSON parsing start
+      const responseText = await response.text();
+      console.log('App: Raw response text:', responseText.substring(0, 200) + '...'); // Debug comment: Raw response
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+        console.log('App: API response data processed:', data); // Debug comment: API data processing
+      } catch (parseError) {
+        console.error('App: JSON parse error:', parseError);
+        console.error('App: Raw response was:', responseText);
+        throw new Error('Invalid response format from server');
+      }
       
       if (!data.success) {
         console.error('App: Transformation failed -', data.message); // Debug comment: Transformation failure
@@ -143,10 +154,13 @@ function AppContent() {
       }
 
       console.log('App: Transformation successful, setting result'); // Debug comment: Transformation success
+      console.log('App: Setting transformed image:', data.transformedImage ? 'Image data received' : 'No image data');
       setTransformedImage(data.transformedImage);
       
       // Update user stats after successful transformation
+      console.log('App: Updating user stats...'); // Debug comment: Stats update start
       await fetchUserStats();
+      console.log('App: User stats updated'); // Debug comment: Stats update complete
     } catch (err) {
       console.error('App: Error transforming image -', err); // Debug comment: Transform error caught
       
