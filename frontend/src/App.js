@@ -164,16 +164,16 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white/90 backdrop-blur-sm shadow-sm border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <div className="text-center flex-1">
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
                 🍌 Nano Banana Image Editor
               </h1>
-              <p className="text-lg text-gray-600">
+              <p className="text-lg text-gray-700">
                 Transform your images with AI-powered artistic styles
               </p>
             </div>
@@ -186,8 +186,8 @@ function AppContent() {
                   {userStats && (
                     <div className="text-sm text-gray-600">
                       <span className={`font-medium ${
-                        userStats.transformationsRemaining > 2 ? 'text-green-600' :
-                        userStats.transformationsRemaining > 0 ? 'text-yellow-600' : 'text-red-600'
+                        userStats.transformationsRemaining > 2 ? 'text-emerald-600' :
+                        userStats.transformationsRemaining > 0 ? 'text-amber-600' : 'text-rose-600'
                       }`}>
                         {userStats.transformationsRemaining} / {userStats.maxTransformations}
                       </span>
@@ -198,9 +198,9 @@ function AppContent() {
                   {/* User Avatar */}
                   <button
                     onClick={() => setShowProfile(true)}
-                    className="flex items-center space-x-2 bg-blue-50 hover:bg-blue-100 rounded-lg px-3 py-2 transition-colors"
+                    className="flex items-center space-x-2 bg-indigo-50 hover:bg-indigo-100 rounded-lg px-3 py-2 transition-colors"
                   >
-                    <div className="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                    <div className="h-8 w-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
                       {(currentUser.displayName || currentUser.email || 'U').charAt(0).toUpperCase()}
                     </div>
                     <span className="text-sm font-medium text-gray-700">
@@ -218,7 +218,7 @@ function AppContent() {
                   </button>
                   <button
                     onClick={() => setShowRegister(true)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+                    className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
                   >
                     Sign Up
                   </button>
@@ -234,7 +234,7 @@ function AppContent() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Upload & Style Selection */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 p-6">
               <ImageUpload
                 onFileSelect={handleFileSelect}
                 selectedFile={selectedFile}
@@ -242,7 +242,7 @@ function AppContent() {
               />
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 p-6">
               <StyleSelector
                 selectedStyle={selectedStyle}
                 onStyleChange={handleStyleChange}
@@ -255,7 +255,7 @@ function AppContent() {
 
           {/* Right Column - Preview & Results */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 p-6">
               {isLoading && (
                 <div className="mb-6">
                   <Loader 
