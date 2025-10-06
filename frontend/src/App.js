@@ -150,28 +150,30 @@ function AppContent() {
         }
       }
 
-      console.log('App: Response is OK, parsing JSON...'); // Debug comment: JSON parsing start
-      const responseText = await response.text();
-      console.log('App: Raw response text:', responseText.substring(0, 200) + '...'); // Debug comment: Raw response
+      console.log('App: Response is OK, processing image...'); // Debug comment: Image processing start
       
-      let data;
-      try {
-        data = JSON.parse(responseText);
-        console.log('App: API response data processed:', data); // Debug comment: API data processing
-      } catch (parseError) {
-        console.error('App: JSON parse error:', parseError);
-        console.error('App: Raw response was:', responseText);
-        throw new Error('Invalid response format from server');
+      // Get usage stats from response headers
+      const usageStatsHeader = response.headers.get('X-Usage-Stats');
+      let usageStats = null;
+      if (usageStatsHeader) {
+        try {
+          usageStats = JSON.parse(usageStatsHeader);
+          console.log('App: Usage stats from headers:', usageStats);
+        } catch (e) {
+          console.warn('App: Could not parse usage stats from headers');
+        }
       }
       
-      if (!data.success) {
-        console.error('App: Transformation failed -', data.message); // Debug comment: Transformation failure
-        throw new Error(data.message || ErrorTypes.TRANSFORMATION_FAILED);
-      }
-
-      console.log('App: Transformation successful, setting result'); // Debug comment: Transformation success
-      console.log('App: Setting transformed image:', data.transformedImage ? 'Image data received' : 'No image data');
-      setTransformedImage(data.transformedImage);
+      // Convert the binary response to a data URL
+      const imageBlob = await response.blob();
+      const imageUrl = URL.createObjectURL(imageBlob);
+      
+      console.log('App: Image blob created, size:', imageBlob.size, 'bytes');
+      console.log('App: Image URL created:', imageUrl);
+      
+      // Set the transformed image
+      setTransformedImage(imageUrl);
+      console.log('App: Transformed image set in state');
       
       // Update user stats after successful transformation
       console.log('App: Updating user stats...'); // Debug comment: Stats update start
@@ -190,6 +192,7 @@ function AppContent() {
     } finally {
       console.log('App: Transform process completed, stopping loading'); // Debug comment: Transform process end
       setIsLoading(false);
+      console.log('App: Loading state set to false');
     }
   };
 

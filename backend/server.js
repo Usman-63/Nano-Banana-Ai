@@ -206,14 +206,20 @@ app.post('/transform', authenticateToken, upload.single('image'), async (req, re
     console.log("✅ Image data found, size:", transformedImage.inlineData.data.length, "bytes");
     console.log("✅ Image MIME type:", transformedImage.inlineData.mimeType);
 
+    // Convert base64 to buffer
+    const imageBuffer = Buffer.from(transformedImage.inlineData.data, 'base64');
+    
     // Record the transformation for usage tracking
     const usageStats = await recordTransformation(req.user.uid, 'image_transform');
 
-    res.json({
-      success: true,
-      transformedImage: `data:image/jpeg;base64,${transformedImage.inlineData.data}`,
-      usage: usageStats
-    });
+    // Send the image directly as binary response
+    res.setHeader('Content-Type', transformedImage.inlineData.mimeType || 'image/png');
+    res.setHeader('Content-Length', imageBuffer.length);
+    res.setHeader('X-Usage-Stats', JSON.stringify(usageStats));
+    
+    console.log("🔹 Sending image as binary response...");
+    res.send(imageBuffer);
+    console.log("✅ Image sent successfully");
 
     // Clean up uploaded file
     try {
