@@ -164,16 +164,32 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 relative overflow-hidden">
+      {/* Additional gradient overlay for more depth */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-cyan-50/40 via-transparent to-rose-50/40"></div>
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-indigo-200/30 to-purple-200/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/2 -left-40 w-96 h-96 bg-gradient-to-br from-purple-200/30 to-pink-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute -bottom-40 right-1/3 w-72 h-72 bg-gradient-to-br from-pink-200/30 to-indigo-200/30 rounded-full blur-3xl animate-pulse delay-2000"></div>
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-br from-cyan-200/20 to-indigo-200/20 rounded-full blur-2xl animate-pulse delay-500"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-rose-200/20 to-purple-200/20 rounded-full blur-2xl animate-pulse delay-1500"></div>
+        
+        {/* Subtle geometric patterns */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-violet-200/10 to-indigo-200/10 rounded-full blur-xl"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-pink-200/15 to-rose-200/15 rounded-full blur-lg"></div>
+        <div className="absolute bottom-20 left-1/3 w-40 h-40 bg-gradient-to-br from-cyan-200/10 to-blue-200/10 rounded-full blur-2xl"></div>
+        <div className="absolute top-1/3 right-1/4 w-28 h-28 bg-gradient-to-br from-emerald-200/10 to-teal-200/10 rounded-full blur-xl"></div>
+      </div>
       {/* Header */}
-      <div className="bg-white/90 backdrop-blur-sm shadow-sm border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="relative z-10 bg-white/90 backdrop-blur-sm shadow-sm border-b border-white/20 min-h-[120px]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-between items-center">
             <div className="text-center flex-1">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-3 leading-tight">
                 🍌 Nano Banana Image Editor
               </h1>
-              <p className="text-lg text-gray-700">
+              <p className="text-base sm:text-lg text-gray-700">
                 Transform your images with AI-powered artistic styles
               </p>
             </div>
@@ -230,7 +246,7 @@ function AppContent() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Upload & Style Selection */}
           <div className="lg:col-span-1 space-y-6">
