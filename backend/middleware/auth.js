@@ -26,7 +26,7 @@ async function authenticateToken(req, res, next) {
       name: decodedToken.name || decodedToken.email
     };
 
-    console.log(`🔐 Authenticated user: ${req.user.email} (${req.user.uid})`);
+    console.log(`🔐 User authenticated successfully`);
     next();
   } catch (error) {
     console.error('Authentication error:', error.message);
@@ -51,7 +51,7 @@ async function optionalAuth(req, res, next) {
         emailVerified: decodedToken.email_verified,
         name: decodedToken.name || decodedToken.email
       };
-      console.log(`🔐 Optional auth - user: ${req.user.email}`);
+      console.log(`🔐 Optional auth - user authenticated`);
     } else {
       req.user = null;
       console.log('🔓 Optional auth - no user');

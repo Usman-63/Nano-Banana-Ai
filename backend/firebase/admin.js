@@ -38,8 +38,9 @@ try {
   firebaseApp = null;
 }
 
-// Get Firebase Auth instance
+// Get Firebase Auth and Firestore instances
 const auth = firebaseApp ? admin.auth() : null;
+const db = firebaseApp ? admin.firestore() : null;
 
 // Verify Firebase ID token
 async function verifyIdToken(idToken) {
@@ -74,6 +75,7 @@ async function getUserByUid(uid) {
 module.exports = {
   admin,
   auth,
+  db,
   verifyIdToken,
   getUserByUid
 };

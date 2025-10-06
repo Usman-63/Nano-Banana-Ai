@@ -7,7 +7,11 @@
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
-  "keywords": ["ai", "image-editor", "api"],
+  "keywords": [
+    "ai",
+    "image-editor",
+    "api"
+  ],
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {

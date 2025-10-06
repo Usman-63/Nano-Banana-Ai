@@ -8,6 +8,7 @@ import ErrorBanner, { ErrorTypes } from './components/ErrorBanner';
 import Login from './components/Login';
 import Register from './components/Register';
 import UserProfile from './components/UserProfile';
+import EmailVerification from './components/EmailVerification';
 
 function AppContent() {
   const { currentUser, getIdToken, userStats, canTransform, fetchUserStats, logout } = useAuth();
@@ -20,6 +21,7 @@ function AppContent() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
 
   // Debug comment: App component state monitoring
   console.log('App: Component rendered with state -', {
@@ -30,6 +32,13 @@ function AppContent() {
     isLoading,
     hasError: !!error
   });
+
+  // Check if user needs email verification
+  React.useEffect(() => {
+    if (currentUser && !currentUser.emailVerified) {
+      setShowEmailVerification(true);
+    }
+  }, [currentUser]);
 
   const handleFileSelect = (file) => {
     console.log('App: File selection triggered -', file?.name); // Debug comment: File selection event
@@ -73,6 +82,13 @@ function AppContent() {
     if (!currentUser) {
       console.error('App: User not authenticated'); // Debug comment: Auth validation error
       setShowLogin(true);
+      return;
+    }
+
+    // Check if email is verified
+    if (!currentUser.emailVerified) {
+      console.error('App: Email not verified'); // Debug comment: Email verification error
+      setShowEmailVerification(true);
       return;
     }
 
@@ -400,6 +416,10 @@ function AppContent() {
 
       {showProfile && (
         <UserProfile onClose={() => setShowProfile(false)} />
+      )}
+
+      {showEmailVerification && (
+        <EmailVerification onClose={() => setShowEmailVerification(false)} />
       )}
     </div>
   );

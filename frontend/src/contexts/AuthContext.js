@@ -6,7 +6,8 @@ import {
   signOut, 
   onAuthStateChanged,
   updateProfile,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  sendEmailVerification
 } from 'firebase/auth';
 import { auth } from '../firebase/config';
 
@@ -81,6 +82,22 @@ export function AuthProvider({ children }) {
       console.log('✅ Password reset email sent');
     } catch (error) {
       console.error('❌ Password reset error:', error);
+      throw error;
+    }
+  }
+
+  // Resend email verification function
+  async function resendEmailVerification() {
+    if (!currentUser) {
+      throw new Error('No user logged in');
+    }
+    
+    try {
+      console.log('🔐 Sending email verification...');
+      await sendEmailVerification(currentUser);
+      console.log('✅ Email verification sent');
+    } catch (error) {
+      console.error('❌ Email verification error:', error);
       throw error;
     }
   }
@@ -193,6 +210,7 @@ export function AuthProvider({ children }) {
     login,
     logout,
     resetPassword,
+    resendEmailVerification,
     getIdToken,
     fetchUserStats,
     updateUserStats,

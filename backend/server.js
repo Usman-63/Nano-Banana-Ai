@@ -13,7 +13,8 @@ const {
   recordTransformation, 
   getUserStats,
   resetUserUsage,
-  getAllUsersUsage 
+  getAllUsersUsage,
+  checkFirestoreHealth
 } = require('./models/userUsage');
 
 const app = express();
@@ -103,7 +104,7 @@ function readImageAsBase64(filePath) {
 
 app.post('/transform', authenticateToken, upload.single('image'), async (req, res) => {
   try {
-    console.log(`🔐 Transform request from user: ${req.user.email} (${req.user.uid})`);
+    console.log(`🔐 Transform request received`);
     
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'No image uploaded' });
@@ -217,12 +218,27 @@ app.get('/user/stats', authenticateToken, async (req, res) => {
 });
 
 // Health check endpoint (no auth required)
-app.get('/health', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Server is running',
-    timestamp: new Date().toISOString()
-  });
+app.get('/health', async (req, res) => {
+  try {
+    const firestoreHealth = await checkFirestoreHealth();
+    
+    res.json({
+      success: true,
+      message: 'Server is running',
+      timestamp: new Date().toISOString(),
+      services: {
+        server: 'healthy',
+        firestore: firestoreHealth
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server health check failed',
+      timestamp: new Date().toISOString(),
+      error: error.message
+    });
+  }
 });
 
 // Test auth endpoint
