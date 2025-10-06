@@ -92,6 +92,10 @@ firebase-debug.*.log
 uploads/
 backend/uploads/
 
+# User data (sensitive - never commit!)
+backend/data/
+data/
+
 # OS generated files
 .DS_Store
 .DS_Store?
