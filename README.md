@@ -11,12 +11,7 @@
 <div align="center">
   <h3>Transform your images with AI-powered artistic styles</h3>
   <p>An intelligent image transformation application built with React, Node.js, and Google's Gemini 2.5 Flash AI model</p>
-  
-  <p>
-    <a href="https://nano-banana-ai-beige.vercel.app/" target="_blank">
-      <img src="https://img.shields.io/badge/Live%20Demo-Visit%20App-green?style=for-the-badge&logo=vercel" alt="Live Demo" />
-    </a>
-  </p>
+
 </div>
 
 ---
