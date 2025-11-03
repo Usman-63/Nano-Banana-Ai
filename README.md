@@ -287,12 +287,11 @@ Production CORS is configured for:
 
 - **Free Tier**: 6 transformations per user
 - **File Size Limit**: 10MB maximum
-- **Supported Formats**: JPEG, PNG, WebP, GIF
+- **Supported Formats**: JPEG, PNG
 - **Rate Limiting**: Built-in usage tracking
 
 ---
 
 <div align="center">
-  <p>Made with ❤️ by the Nano Banana Team</p>
   <p>🚀 Transform your images with the power of AI</p>
 </div>
