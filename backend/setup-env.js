@@ -41,7 +41,7 @@ try {
   console.log('   1. FIREBASE_PROJECT_ID - Your Firebase project ID');
   console.log('   2. GOOGLE_API_KEY - Your Google AI API key');
   console.log('   3. FIREBASE_SERVICE_ACCOUNT_KEY - Your Firebase service account JSON');
-  console.log('\n📖 See backend/ENVIRONMENT_SETUP.md for detailed instructions');
+  console.log('\n📖 See ../FIREBASE_SETUP.md for detailed instructions');
 } catch (error) {
   console.error('❌ Error creating .env file:', error.message);
   process.exit(1);

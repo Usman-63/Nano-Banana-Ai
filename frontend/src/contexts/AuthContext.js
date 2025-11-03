@@ -117,7 +117,7 @@ export function AuthProvider({ children }) {
     
     try {
       const token = await getIdToken();
-      const url = `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:3000'}/user/stats`;
+      const url = `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}/user/stats`;
       
       const response = await fetch(url, {
         headers: {

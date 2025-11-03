@@ -140,7 +140,7 @@ function AppContent() {
       formData.append('style', selectedStyle);
 
       // Sending API request
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:3000'}/transform`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'}/transform`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${idToken}`

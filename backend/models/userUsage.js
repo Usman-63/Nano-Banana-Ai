@@ -7,7 +7,10 @@ const COLLECTION_NAME = 'userUsage';
 // Check if Firestore is available
 function checkFirestore() {
   if (!db) {
-    throw new Error('Firestore not initialized. Please check Firebase configuration.');
+    const errorMsg = 'Firestore not initialized. Please check Firebase configuration. ' +
+      'Make sure FIREBASE_PROJECT_ID and either GOOGLE_APPLICATION_CREDENTIALS or FIREBASE_SERVICE_ACCOUNT_KEY are set correctly.';
+    console.error('❌', errorMsg);
+    throw new Error(errorMsg);
   }
 }
 

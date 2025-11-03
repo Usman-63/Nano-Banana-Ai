@@ -6,6 +6,20 @@ const path = require('path');
 const fs = require('fs');
 const { GoogleGenAI } = require("@google/genai");
 
+// Import Firebase admin to check initialization
+const { db, auth } = require('./firebase/admin');
+
+// Check if Firebase Admin SDK is properly initialized
+if (!db || !auth) {
+  console.error('❌ ERROR: Firebase Admin SDK not properly initialized.');
+  console.error('   Please check your Firebase configuration:');
+  console.error('   1. Set FIREBASE_PROJECT_ID in your .env file');
+  console.error('   2. Set either GOOGLE_APPLICATION_CREDENTIALS or FIREBASE_SERVICE_ACCOUNT_KEY');
+  console.error('   3. Or place a service account key JSON file in the backend directory');
+  console.error('\n   See FIREBASE_SETUP.md for detailed instructions');
+  process.exit(1);
+}
+
 // Firebase authentication and usage tracking
 const { authenticateToken, optionalAuth } = require('./middleware/auth');
 const { 
@@ -216,7 +230,9 @@ app.post('/transform', authenticateToken, upload.single('image'), async (req, re
 // User stats endpoint
 app.get('/user/stats', authenticateToken, async (req, res) => {
   try {
+    console.log('📊 Fetching user stats');
     const stats = await getUserStats(req.user.uid);
+    console.log('✅ User stats retrieved successfully');
     res.json({
       success: true,
       user: {
@@ -227,10 +243,21 @@ app.get('/user/stats', authenticateToken, async (req, res) => {
       usage: stats
     });
   } catch (error) {
-    console.error('Error getting user stats:', error);
+    console.error('❌ Error getting user stats:', error);
+    console.error('   Error details:', error.message);
+    console.error('   Stack:', error.stack);
+    
+    // Provide more specific error messages
+    let errorMessage = 'Error getting user stats';
+    if (error.message.includes('Firestore not initialized')) {
+      errorMessage = 'Firebase configuration error. Please check server logs.';
+    } else if (error.message.includes('Failed to retrieve')) {
+      errorMessage = 'Unable to retrieve user statistics from database.';
+    }
+    
     res.status(500).json({
       success: false,
-      message: 'Error getting user stats',
+      message: errorMessage,
       error: error.message
     });
   }
